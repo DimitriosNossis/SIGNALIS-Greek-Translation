@@ -1,4 +1,4 @@
-![SIGNALIS Greek Translation Cover Image](cover.jpg)
+![SIGNALIS Greek Translation Cover Image](cover.png)
 
 # SIGNALIS - Ελληνική Μετάφραση
 
