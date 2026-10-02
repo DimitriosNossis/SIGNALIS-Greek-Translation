@@ -1,0 +1,10 @@
+__pycache__/
+build/
+dist/
+*.spec
+# never commit game files
+*.unity3d
+*.unity3d.*
+*.assets
+*.bin
+build.log
