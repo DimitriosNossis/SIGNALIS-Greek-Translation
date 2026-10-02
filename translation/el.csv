@@ -290,7 +290,7 @@ Inv MemoryView,Προβολή μνήμης
 MainMenu Play,Έναρξη
 MainMenu Continue,Συνέχεια
 MainMenu Settings,Ρυθμίσεις
-MainMenu Credits,Συντελεστές
+MainMenu Credits,Credits
 MainMenu Quit,Έξοδος
 MainMenu Manual,Εγχειρίδιο
 PauseMenuManual,Εγχειρίδιο
@@ -2685,32 +2685,37 @@ LAB_Offerings,"<title>Προσφορές</title>
 έξω από αυτό το καταραμένο μέρος"
 LAB_Warning,"<title>Φύγε</title>
 <mspace=3em><line-height=50%>^
-PTL | L
-LHE | E
-AIA | A
-CSV | V
-E E | E
+ΕΑΦ | Φ
+ΔΠΥ | Υ
+ΩΟΓ | Γ
+  Ε | Ε
 </mspace>"
 LAB_Holes,"<title>Τρύπες</title>
 <mspace=3em><line-height=50%>^
-STOPEWDASHG| H
-UOUOAHIREOR| O
-F GRREGECLE| L
-F HETRG REA| E
-I TSHEE EST| S
-C   S D T  |
-E       L  |
-        Y  |
+ΓΤΠΟΕΘΠΕΚΣΤΜ | Τ
+ΗΗΟΙΦΑΟΚΡΚΡΕ | Ρ
+ΣΣΡ Τ ΥΕΥΑΥΓ | Υ
+  Ο Α  ΙΦΒΠΑ | Π
+  Ι Ν   ΑΟΕΛ | Ε
+    Α    ΝΣΕ | Σ
+    Ν    Τ Σ |  
+         Α   |  
+         Ι   |  
 </mspace>"
 LAB_Rings,"<title>Το χέρι της Αυτοκράτειρας</title>
 <mspace=3em><line-height=50%>^
-LHTSDLTO WWSDNTO DWNDLTO CWSDFTO | E
-IEOHAAHN EAHAEHN OAOAOHN RAHAIHN | M
-FROEYSE  DSEYXE  NSTYNE  OSEYRE  | P
-E K  T       T   E H G   W   S   | R
-                   I E   N   T   | E
-                   N S   E       | S
-                   G T   D       | S
+ΑΜΤΤ ΠΜΕΤ ΤΕΔΜΜΠΤ ΣΜΠΤ | Α
+ΥΕΕΗ ΑΕΠΗ ΙΓΕΕΕΙΗ ΤΕΡΗ | Υ
+ΤΡΛΝ ΝΡΟΝ ΠΙΝΡΓΟΝ ΕΡΩΝ | Τ
+ΟΑΕ  ΤΑΜ  ΟΝ ΑΑ   ΦΑΤ  | Ο
+Κ Υ  Ρ Ε  ΤΕ  Λ   Θ Η  | Κ
+Τ Τ  Ε Ν  Α   Η   Η    | Ρ
+Ο Α  Υ Η          Κ    | Α
+Ν Ι  Τ            Ε    | Τ
+Η Α  Η                 | Ε
+Σ    Κ                 | Ι
+Ε    Ε                 | Ρ
+                       | Α
 </mspace>"
 LOV_IsaNote,"<title>Το σημείωμα της Isa</title>
 Erika,

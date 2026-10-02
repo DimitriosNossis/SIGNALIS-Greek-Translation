@@ -21,7 +21,7 @@ from PIL import Image
 from .greekfont import Font, add_greek, add_greek_caps_five, to_runtime
 from .locdata import build, parse, tables
 
-VERSION = "0.9.0"
+VERSION = "0.9.1"
 SLOT = "ru"
 CONTAINER = "LocalizerDataContainer"
 FONTS = ("Silver_JPC", "Silver_JPC_SDF", "SignalisFive_rasterHinted16")

@@ -88,13 +88,12 @@ python patch.py --game "D:\Games\SIGNALIS"   # αν το παιχνίδι δε �
 - Κείμενα που είναι μέρος εικόνων (πινακίδες, αφίσες, η επικεφαλίδα PAUSE) και οι
   ετικέτες στις θέσεις των αντικειμένων παραμένουν στα αγγλικά - δεν είναι
   μεταφράσιμα από τον patcher.
-- Μερικοί γρίφοι στον Λαβύρινθο βασίζονται σε αγγλικά γράμματα, οπότε μένουν στα
-  αγγλικά για να λύνονται σωστά. Το ίδιο ισχύει για τα κομμάτια κειμένου που
-  εμφανίζονται σκόπιμα δυσανάγνωστα.
+- Τα κομμάτια κειμένου που εμφανίζονται σκόπιμα δυσανάγνωστα μένουν στα αγγλικά,
+  αφού ούτως ή άλλως δε διαβάζονται.
 - Ορισμένα κείμενα μπορεί να μη χωρούν στο πλαίσιό τους, καθώς μερικά από τα
   ελληνικά κείμενα είναι μεγαλύτερα σε έκταση από τα αγγλικά.
 
-Η έκδοση **0.9.0** σημαίνει ότι η μετάφραση είναι πλήρης αλλά ο έλεγχος μέσα στο
+Η έκδοση **0.9.1** σημαίνει ότι η μετάφραση είναι πλήρης αλλά ο έλεγχος μέσα στο
 παιχνίδι συνεχίζεται.
 
 ## Αναφορά προβλημάτων
@@ -131,7 +130,7 @@ The patcher works on the player's own copy of the game: no game files are includ
 in this repository. The original `data.unity3d` is backed up as
 `data.unity3d.original` in the game folder.
 
-Version 0.9.0 - the translation is complete, but in-game testing is ongoing.
+Version 0.9.1 - the translation is complete, but in-game testing is ongoing.
 Bug reports are welcome as issues on this repository; screenshots help.
 
 ### Building
