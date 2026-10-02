@@ -1,0 +1,94 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: Prerelease
+        type: boolean
+      bypassCheck:
+        description: Bypass Version Check
+        type: boolean
+
+permissions:
+  contents: write
+
+env:
+  EXE_NAME: SIGNALIS-Greek-Patcher
+
+jobs:
+  pre_job:
+    name: Check For Other Releases
+    outputs:
+      version: ${{ steps.out.outputs.version }}
+      exists: ${{ steps.out.outputs.exists }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: "actions/checkout@v4"
+
+      - name: Fetch
+        run: git fetch
+
+      - name: Read Version
+        id: read-version
+        run: echo "version=$(grep -oP '^VERSION = "\K[^"]+' signalis_greek/patcher.py)" >> $GITHUB_OUTPUT
+
+      - name: Check For Release
+        id: check-tag
+        run: echo "exists=$(git ls-remote --exit-code --tags origin ${{ env.TAG }} >/dev/null 2>&1 && echo true || echo false)" >> $GITHUB_OUTPUT
+        env:
+          TAG: "v${{ steps.read-version.outputs.version }}"
+
+      - name: Output Version Info
+        id: out
+        run: |
+          echo "version=${{ steps.read-version.outputs.version }}" >> $GITHUB_OUTPUT
+          echo "exists=${{ steps.check-tag.outputs.exists }}" >> $GITHUB_OUTPUT
+
+      - name: Error
+        if: ${{ steps.out.outputs.exists != 'false' && (!inputs.bypassCheck) }}
+        run: echo "::error file=signalis_greek/patcher.py,title=Refusing to Release::The patcher was not released because there is already a release with the VERSION in signalis_greek/patcher.py"
+
+  release:
+    needs: pre_job
+    if: ${{ (needs.pre_job.outputs.version != '') && (needs.pre_job.outputs.exists == 'false') || (inputs.bypassCheck) }}
+    name: Create Release
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: "actions/checkout@v4"
+
+      - name: Setup Python
+        uses: "actions/setup-python@v5"
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+
+      - name: Build Patcher
+        run: .\build_exe.bat
+
+      - name: Check Patcher
+        run: .\dist\${{ env.EXE_NAME }}.exe --help
+
+      - name: Upload Artifact
+        uses: "actions/upload-artifact@v4"
+        with:
+          name: "${{ env.EXE_NAME }}"
+          path: "dist/${{ env.EXE_NAME }}.exe"
+
+      - name: Create Release
+        uses: "ncipollo/release-action@v1"
+        with:
+          allowUpdates: true
+          commit: ${{ github.ref_name }}
+          tag: v${{ needs.pre_job.outputs.version }}
+          name: Version ${{ needs.pre_job.outputs.version }}
+          omitBodyDuringUpdate: true
+          artifacts: "dist/${{ env.EXE_NAME }}.exe"
+          draft: true
+          prerelease: ${{ inputs.prerelease }}
