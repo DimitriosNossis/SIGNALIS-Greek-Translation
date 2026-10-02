@@ -1,1 +1,0 @@
-"""SIGNALIS Greek translation patcher."""
