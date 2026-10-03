@@ -18,10 +18,10 @@ import numpy as np
 import UnityPy
 from PIL import Image
 
-from .greekfont import Font, add_greek, add_greek_caps_five, to_runtime
+from .greekfont import Font, add_greek, add_greek_caps_five, draw_door_labels, draw_inspect_label, to_runtime
 from .locdata import build, parse, tables
 
-VERSION = "0.9.1"
+VERSION = "0.9.2"
 SLOT = "ru"
 CONTAINER = "LocalizerDataContainer"
 FONTS = ("Silver_JPC", "Silver_JPC_SDF", "SignalisFive_rasterHinted16")
@@ -76,6 +76,26 @@ def steam_libraries():
     return list(dict.fromkeys(libs))
 
 
+GAME_RUNNING = ("SIGNALIS seems to be running. Close the game and run the patcher again.\n"
+                "Το SIGNALIS φαίνεται να είναι ανοιχτό. Κλείσε το παιχνίδι και τρέξε ξανά τον patcher.")
+
+
+def check_not_running():
+    """The game keeps data.unity3d open while running, so Windows won't let us replace it.
+    Checked up front so players don't wait for the whole patch first."""
+    if sys.platform != "win32":
+        return
+    import subprocess
+    try:
+        out = subprocess.run(["tasklist", "/FI", "IMAGENAME eq SIGNALIS.exe", "/NH"],
+                             capture_output=True, text=True, timeout=15,
+                             creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)).stdout
+    except (OSError, subprocess.SubprocessError):
+        return
+    if "signalis.exe" in out.lower():
+        raise RuntimeError(GAME_RUNNING)
+
+
 def data_file(game_dir):
     return os.path.join(game_dir, "SIGNALIS_Data", "data.unity3d")
 
@@ -105,6 +125,13 @@ def patch_fonts(behaviours, textures):
         fonts[name] = (Font(behaviours[name].get_raw_data(), atlas), tex)
     add_greek(fonts["Silver_JPC"][0], fonts["Silver_JPC_SDF"][0])
     add_greek_caps_five(fonts["SignalisFive_rasterHinted16"][0])
+    door = textures["Door_interactions"].read()
+    door_img = draw_door_labels(np.array(door.image.convert("RGBA")), fonts["SignalisFive_rasterHinted16"][0])
+    door.image = Image.fromarray(door_img, "RGBA")
+    door.save()
+    insp = textures["Interaction_inspect"].read()
+    insp.image = Image.fromarray(draw_inspect_label(np.array(insp.image.convert("RGBA")), fonts["SignalisFive_rasterHinted16"][0]), "RGBA")
+    insp.save()
     for name, (font, tex) in fonts.items():
         behaviours[name].set_raw_data(font.build())
         img = np.zeros(font.atlas.shape + (4,), np.uint8)
@@ -126,9 +153,9 @@ def patch_bundle(source, target):
                 behaviours[name] = o
         elif o.type.name == "Texture2D":
             name = o.peek_name()
-            if name in {f + " Atlas" for f in FONTS}:
+            if name in {f + " Atlas" for f in FONTS} | {"Door_interactions", "Interaction_inspect"}:
                 textures[name] = o
-    missing = ({CONTAINER, *FONTS} - set(behaviours)) | ({f + " Atlas" for f in FONTS} - set(textures))
+    missing = ({CONTAINER, *FONTS} - set(behaviours)) | (({f + " Atlas" for f in FONTS} | {"Door_interactions", "Interaction_inspect"}) - set(textures))
     if missing:
         raise RuntimeError(f"this version of SIGNALIS is not supported (missing {sorted(missing)})")
 
@@ -168,7 +195,11 @@ def patch_bundle(source, target):
     tmp = target + ".tmp"
     with open(tmp, "wb") as f:
         f.write(data)
-    os.replace(tmp, target)
+    try:
+        os.replace(tmp, target)
+    except PermissionError:
+        os.remove(tmp)
+        raise RuntimeError(GAME_RUNNING)
     return done, len(en)
 
 
@@ -183,6 +214,7 @@ def run(args):
     data = data_file(game)
     backup, marker = data + BACKUP_SUFFIX, data + MARKER_SUFFIX
     print(f"Game: {game}")
+    check_not_running()
 
     if args.restore:
         if not os.path.exists(backup):

@@ -339,3 +339,86 @@ def add_greek_caps_five(font):
             font.alias(ch, cap)
             added += 1
     return added
+
+
+# ---------------------------------------------------------------- door / ladder prompt sprites
+# Door_interactions texture: English labels are 16x64 strips, text rotated (reads bottom to top),
+# 5px SignalisFive letters, black on a coloured box with a 1px black border.
+DOOR_STRIPS = {  # sprite index: (x, top row, Greek label)
+    12: (96, 0, "ΒΛΑΒΗ"),        # NO ENTRY  (broken door, 故障)
+    13: (112, 0, "ΚΛΕΙΔΙ"),      # NEED KEY
+    14: (128, 0, "ΑΝΕΒΑ"),       # CLIMB UP
+    17: (144, 0, "ΚΑΤΕΒΑ"),      # CLIMB DOWN
+    18: (160, 0, "ΠΑΝΩ"),        # GO UP
+    19: (176, 0, "ΚΑΤΩ"),        # GO DOWN
+    24: (160, 64, "ΚΛΕΙΣΤΟ"),    # LOCKED
+    23: (176, 64, "ΠΗΔΑ ΚΑΤΩ"),  # DROP DOWN
+}
+
+
+def label_bitmaps(five, text):
+    """Glyph bitmaps (5 rows high) for text in the patched SignalisFive font; space = 5px gap."""
+    out = []
+    for ch in text:
+        if ch == " ":
+            out.append(np.zeros((5, 5), np.uint8))
+        else:
+            out.append(five.crop(ch))
+    return out
+
+
+def draw_door_labels(img, five):
+    """img: RGBA array of Door_interactions (top row first). Redraws the English strips in Greek."""
+    for idx, (x, top, text) in DOOR_STRIPS.items():
+        strip = img[top:top + 64, x:x + 16]
+        alpha = strip[..., 3] > 0
+        rows = np.where(alpha.any(1))[0]
+        r0, c0 = rows.min(), np.where(alpha.any(0))[0].min()
+        fill = strip[r0 + 1, c0 + 1].copy()
+        border = strip[r0, c0].copy()
+        glyphs = label_bitmaps(five, text)
+        text_len = sum(g.shape[1] for g in glyphs) + len(glyphs) - 1
+        box_len = text_len + 6                      # border + 2px margin on each side
+        assert box_len <= 62, f"label too long: {text}"
+        b0 = 31 - box_len // 2
+        b1 = b0 + box_len - 1
+        strip[:] = 0
+        strip[b0:b1 + 1, 2:14] = border
+        strip[b0 + 1:b1, 3:13] = fill
+        cursor = b1 - 3                             # text starts at the bottom, reads upwards
+        for g in glyphs:
+            gh, gw = g.shape
+            for gy in range(gh):
+                for gx in range(gw):
+                    if g[gy, gx] > 127:
+                        strip[cursor - gx, 6 + gy] = border
+            cursor -= gw + 1
+    return img
+
+
+INSPECT_LABEL = "ΕΛΕΓΞΕ"
+
+
+def draw_inspect_label(img, five, text=INSPECT_LABEL):
+    """Interaction_inspect texture (48x16): horizontal 'INSPECT' box redrawn with Greek text."""
+    alpha = img[..., 3] > 0
+    rows = np.where(alpha.any(1))[0]
+    cols = np.where(alpha.any(0))[0]
+    r0, r1, c0 = rows.min(), rows.max(), cols.min()
+    fill, border = img[r0 + 1, c0 + 1].copy(), img[r0, c0].copy()
+    glyphs = label_bitmaps(five, text)
+    text_w = sum(g.shape[1] for g in glyphs) + len(glyphs) - 1
+    box_w = text_w + 6
+    H, W = img.shape[:2]
+    assert box_w <= W, f"label too long: {text}"
+    b0 = (W - box_w) // 2
+    img[:] = 0
+    img[r0:r1 + 1, b0:b0 + box_w] = border
+    img[r0 + 1:r1, b0 + 1:b0 + box_w - 1] = fill
+    x, y = b0 + 3, r0 + 3                     # 2px margin inside the border, like the original
+    for g in glyphs:
+        gh, gw = g.shape
+        mask = g > 127
+        img[y:y + gh, x:x + gw][mask] = border
+        x += gw + 1
+    return img
