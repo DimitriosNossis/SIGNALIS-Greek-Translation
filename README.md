@@ -31,15 +31,6 @@
 Τρέξε ξανά το **SIGNALIS-Greek-Patcher.exe** και πάτησε **2** (Επαναφορά).
 Εναλλακτικά, στο Steam: **Properties → Installed Files → Verify integrity of game files**.
 
-### Με Python (για προχωρημένους)
-
-```bash
-pip install -r requirements.txt
-python patch.py              # εγκατάσταση
-python patch.py --restore    # επαναφορά
-python patch.py --game "D:\Games\SIGNALIS"   # αν το παιχνίδι δε βρεθεί αυτόματα
-```
-
 ## Χρήση
 
 Μέσα στο παιχνίδι:
@@ -132,15 +123,6 @@ in this repository. The original `data.unity3d` is backed up as
 
 Version 0.9.2 - the translation is complete, but in-game testing is ongoing.
 Bug reports are welcome as issues on this repository; screenshots help.
-
-### Building
-
-```bash
-pip install -r requirements.txt pyinstaller
-build_exe.bat
-```
-
-The result is `dist/SIGNALIS-Greek-Patcher.exe`.
 
 ### Licences
 
